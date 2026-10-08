@@ -1,0 +1,25 @@
+version: "1.0"
+
+defaults:
+  base_dir: "../worktree"
+
+hooks:
+  post_create:
+    - type: copy
+      from: "policy-cloud-server/.env.local"
+      to: "policy-cloud-server/.env.local"
+
+    - type: copy
+      from: "policy-cloud-front/.env.local"
+      to: "policy-cloud-front/.env.local"
+
+    - type: copy
+      from: "policy-cloud-server/frontend/.env.local"
+      to: "policy-cloud-server/frontend/.env.local"
+
+    - type: command
+      command: npm install
+
+    - type: command
+      command: npx lefthook install
+

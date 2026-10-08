@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://laws.e-gov.go.jp/api/1/lawlists/3\")",
+      "Bash(curl -s \"https://laws.e-gov.go.jp/api/1/lawlists/4\")",
+      "Bash(gh auth:*)",
+      "Bash(gh label:*)"
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "claude-community": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-community"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "enabledPlugins": {
+    "html-plan@claude-community": true
+  }
+}

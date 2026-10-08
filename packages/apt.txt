@@ -1,0 +1,43 @@
+# install.sh が apt で入れるもの（Ubuntu 24.04）。# 以降はコメント
+
+# 基本
+build-essential
+ca-certificates
+curl
+git
+gnupg
+jq
+lsof
+unzip
+zip
+zsh
+
+# Mac の Homebrew で入れていたもの（名前が違うものは右に Mac での名前）
+bat              # bat（Ubuntu ではコマンド名が batcat。install.sh が bat でも呼べるようにする）
+fd-find          # fd（コマンド名は fdfind。同上）
+fzf
+golang-go        # go
+lsd
+neovim
+poppler-utils    # poppler
+postgresql-client  # libpq（psql）
+ripgrep
+tmux
+tree
+
+# WSL: wslview（Windows 側のブラウザで開く）
+wslu
+
+# asdf で Python をソースからビルドするのに必要
+libbz2-dev
+libffi-dev
+liblzma-dev
+libncursesw5-dev
+libreadline-dev
+libsqlite3-dev
+libssl-dev
+libxml2-dev
+libxmlsec1-dev
+tk-dev
+xz-utils
+zlib1g-dev
