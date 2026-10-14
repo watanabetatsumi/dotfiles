@@ -46,7 +46,7 @@ cd dotfiles && ./install.sh
 | `gh` / `docker` | GitHub CLI と Docker Engine（公式の apt リポジトリ）。Docker Desktop は使わない |
 | `asdf` | asdf 0.18.1 と、`tool-versions` の Node.js・Python・Terraform |
 | `uv` / `wtp` / `tflint` / `gcloud` | それぞれ公式の配布物から |
-| `zsh` / `dotfiles` | oh-my-zsh、`~/.zshrc`・`~/.gitconfig` のリンク、git のメールアドレス（`~/.gitconfig.local`） |
+| `zsh` / `dotfiles` | oh-my-zsh、`~/.zshrc`・`~/.gitconfig`・`~/.tmux.conf` のリンク、git のメールアドレス（`~/.gitconfig.local`） |
 | `github` | `gh auth login`（ブラウザでログイン） |
 | `claude` / `codex` | Claude Code と Codex CLI、設定と skill、各エージェントの `AGENTS.md` |
 | `projects` | `~/projects/my-product-harness`（skill をリンク）、`~/projects/policy-cloud/{main,worktree,devtools}` |
@@ -60,6 +60,7 @@ cd dotfiles && ./install.sh
 |---|---|---|
 | `zsh/zshrc` | `~/.zshrc` | Mac / Linux 共通。マシン固有の設定は `~/.zshrc.local` |
 | `git/gitconfig` | `~/.gitconfig` | メールアドレスは `~/.gitconfig.local` |
+| `tmux/tmux.conf` | `~/.tmux.conf` | Mac / Linux 共通。クリップボードは pbcopy・clip.exe（WSL）・xclip を自動で選ぶ（tmux 3.2 以上） |
 | `tool-versions` | `~/.tool-versions` | asdf のグローバルなバージョン |
 | `claude/settings.json` | `~/.claude/settings.json` | 無いときだけコピー。Orca などが書き込む hooks・statusLine は含めない |
 | `claude/skills/` | `~/.claude/skills/` | my-product-harness 以外の skill。`react-best-practice` は Vercel の MIT ライセンス |

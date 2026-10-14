@@ -42,8 +42,8 @@ do_preflight() {
   step "前提の確認"
   [[ "$(uname -s)" == Linux ]] || { echo "このスクリプトは Ubuntu（WSL）用です。Mac では ./capture.sh を使ってください" >&2; exit 1; }
   . /etc/os-release
-  [[ "$ID" == ubuntu ]] || warn "Ubuntu 以外（$PRETTY_NAME）では未確認です"
-  [[ "$VERSION_ID" == 24.04 ]] || warn "Ubuntu 24.04 以外（$VERSION_ID）では未確認です"
+  [[ "$ID" == ubuntu ]] || warn "Ubuntu 以外（${PRETTY_NAME}）では未確認です"
+  [[ "$VERSION_ID" == 24.04 ]] || warn "Ubuntu 24.04 以外（${VERSION_ID}）では未確認です"
   if is_wsl; then
     info "WSL を検出しました"
     [[ "$PWD" == /mnt/* ]] && warn "Windows 側のフォルダ（/mnt/c など）は遅いので、~/projects などで作業してください"
@@ -162,6 +162,7 @@ do_dotfiles() {
   step "設定ファイルのリンク"
   link zsh/zshrc "$HOME/.zshrc"
   link git/gitconfig "$HOME/.gitconfig"
+  link tmux/tmux.conf "$HOME/.tmux.conf"
   if ! git config -f "$HOME/.gitconfig.local" user.email >/dev/null 2>&1; then
     local email="${GIT_EMAIL:-}"
     [[ -z "$email" ]] && { read -r -p "  git のメールアドレス: " email </dev/tty 2>/dev/null || true; }
@@ -275,6 +276,6 @@ if [[ "${1:-}" == --list ]]; then printf '%s\n' "${STEPS[@]}"; exit 0; fi
 selected=("$@"); [[ ${#selected[@]} -eq 0 ]] && selected=("${STEPS[@]}")
 [[ " ${selected[*]} " == *" preflight "* ]] || do_preflight
 for s in "${selected[@]}"; do
-  declare -F "do_$s" >/dev/null || { echo "不明な手順: $s（./install.sh --list）" >&2; exit 1; }
+  declare -F "do_$s" >/dev/null || { echo "不明な手順: ${s}（./install.sh --list）" >&2; exit 1; }
   "do_$s"
 done
