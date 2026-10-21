@@ -7,16 +7,38 @@
       "Bash(gh label:*)"
     ]
   },
+  "enabledPlugins": {
+    "html-plan@claude-community": true,
+    "natural-japanese@natural-japanese": true,
+    "pstack@cursor-plugins": true,
+    "codex@openai-codex": true
+  },
   "extraKnownMarketplaces": {
     "claude-community": {
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-community"
       }
+    },
+    "natural-japanese": {
+      "source": {
+        "source": "github",
+        "repo": "coji/natural-japanese"
+      }
+    },
+    "cursor-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "cursor/plugins"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
   },
   "tui": "fullscreen",
-  "enabledPlugins": {
-    "html-plan@claude-community": true
-  }
+  "skipWorkflowUsageWarning": true
 }

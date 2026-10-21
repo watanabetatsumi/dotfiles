@@ -50,6 +50,11 @@ copy "$PC/CLAUDE.md" "$DOT/policy-cloud/CLAUDE.md"
 copy "$PC/AGENTS.md" "$DOT/policy-cloud/AGENTS.md"
 copy "$PC/main/.wtp.yml" "$DOT/policy-cloud/wtp.yml"
 
+step "Neovim の設定（~/.config/nvim。退避ファイル *.bak.* は除く）"
+if [[ -d "$HOME/.config/nvim" && ! -L "$HOME/.config/nvim" ]]; then
+  rsync -a --delete --exclude '*.bak.*' "$HOME/.config/nvim/" "$DOT/nvim/"; echo "  nvim/"
+fi
+
 step "asdf のグローバルなバージョン"
 copy "$HOME/.tool-versions" "$DOT/tool-versions"
 

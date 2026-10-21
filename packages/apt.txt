@@ -18,7 +18,6 @@ fd-find          # fd（コマンド名は fdfind。同上）
 fzf
 golang-go        # go
 lsd
-neovim
 poppler-utils    # poppler
 postgresql-client  # libpq（psql）
 ripgrep

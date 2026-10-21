@@ -18,9 +18,12 @@ HARNESS_REPO="${HARNESS_REPO:-watanabetatsumi/my-product-harness}"
 
 ASDF_VERSION="0.18.1"   # Mac と同じ
 WTP_VERSION="2.10.3"    # Mac と同じ
+CODEX_MODEL="gpt-6.1-sol"   # ChatGPT のログインで使える Codex のモデル
+NVIM_VERSION="0.12.0"   # Mac と同じ（apt の 0.9 系は、今の設定のプラグインには古い）
+HERDR_NVIM_NAV_REF="ec047fd6d8d0269d54a34e9405af28d8aad4c8f0"   # 中身を確認した版（2026-10-21）
 TFLINT_VERSION="0.61.0" # Mac と同じ
 
-STEPS=(preflight apt gh docker asdf uv wtp tflint gcloud zsh dotfiles github claude codex projects vscode schedule doctor)
+STEPS=(preflight apt gh docker asdf uv wtp tflint gcloud zsh dotfiles github claude codex projects herdr nvim vscode schedule doctor)
 
 step() { printf '\n\033[1;36m▶ %s\033[0m\n' "$*"; }
 info() { printf '  %s\n' "$*"; }
@@ -93,7 +96,7 @@ do_docker() {
   else
     info "インストール済み: $(docker --version)"
   fi
-  if ! id -nG "$USER" | grep -qw docker; then
+  if [[ " $(id -nG "$USER") " != *" docker "* ]]; then
     sudo usermod -aG docker "$USER"
     warn "docker グループに追加しました。sudo なしで使うには、ターミナルを開き直してください"
   fi
@@ -110,7 +113,8 @@ do_asdf() {
   link tool-versions "$HOME/.tool-versions"
   local plugin
   for plugin in $(awk '{print $1}' "$DOT/tool-versions"); do
-    asdf plugin list 2>/dev/null | grep -qx "$plugin" || asdf plugin add "$plugin"
+    # | grep -q は pipefail の下で SIGPIPE により偽になることがあるので、出力を受け取ってから調べる
+    grep -qx "$plugin" <<<"$(asdf plugin list 2>/dev/null)" || asdf plugin add "$plugin"
   done
   (cd "$HOME" && asdf install)
   asdf current 2>/dev/null | sed 's/^/  /' || true
@@ -192,6 +196,8 @@ do_claude() {
   local s
   for s in "$DOT/claude/skills"/*/; do link "claude/skills/$(basename "$s")" "$HOME/.claude/skills/$(basename "$s")"; done
   info "my-product-harness の skill は projects の手順でリンクします"
+  # 全プロジェクト共通の指示（手を動かす作業は Codex に任せる）
+  link claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
 }
 
 do_codex() {
@@ -200,6 +206,17 @@ do_codex() {
   have codex || npm install -g @openai/codex
   link agents/codex/AGENTS.md "$HOME/.codex/AGENTS.md"
   link agents/dsh/AGENTS.md "$HOME/.dsh/AGENTS.md"
+  # Codex の既定のモデル（Claude から任せたときもこれが使われる）。設定ファイルが無いときだけ作る
+  if [[ ! -f "$HOME/.codex/config.toml" ]]; then
+    printf 'model = "%s"\n' "$CODEX_MODEL" >"$HOME/.codex/config.toml"; info "~/.codex/config.toml を作りました（model = $CODEX_MODEL）"
+  fi
+  # Claude Code から Codex に作業を任せるプラグイン（openai/codex-plugin-cc）
+  if have claude; then
+    claude plugin marketplace add openai/codex-plugin-cc >/dev/null 2>&1 || true
+    claude plugin install codex@openai-codex >/dev/null 2>&1 && info "Claude Code に codex プラグインを入れました" ||
+      warn "codex プラグインを入れられませんでした（claude で /plugin install codex@openai-codex）"
+  fi
+  codex login status >/dev/null 2>&1 || warn "Codex にログインしてください: codex login"
 }
 
 clone() {   # clone <owner/name> <置き場所>
@@ -230,6 +247,36 @@ do_projects() {
   (cd "$PC/main" && asdf install nodejs && asdf install terraform) || warn "main の .tool-versions のインストールに失敗しました"
 }
 
+do_herdr() {
+  step "herdr（エージェントを並べる画面）"
+  if ! have herdr; then
+    curl -fsSL https://herdr.dev/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+  fi
+  info "$(herdr --version)"
+  link herdr/config.toml "$HOME/.config/herdr/config.toml"
+  # Ctrl+h/j/k/l で Neovim と herdr のペインを行き来する（C のビルドに build-essential が要る）
+  if [[ "$(herdr plugin list 2>/dev/null)" == *herdr-nvim-nav* ]]; then info "herdr-nvim-nav は入っています"
+  else herdr plugin install aimdevlee/herdr-nvim-nav --ref "$HERDR_NVIM_NAV_REF" --yes
+  fi
+  info "使い始めるには: herdr（または wta new <branch>）"
+}
+
+do_nvim() {
+  step "Neovim $NVIM_VERSION と設定"
+  if ! have nvim || [[ "$(nvim --version | head -n1)" != *"v$NVIM_VERSION"* ]]; then
+    local a; a=$(arch); [[ "$a" == amd64 ]] && a=x86_64
+    mkdir -p "$HOME/.local/opt"
+    curl -fsSL "https://github.com/neovim/neovim/releases/download/v$NVIM_VERSION/nvim-linux-$a.tar.gz" | tar -xz -C "$HOME/.local/opt"
+    rm -rf "$HOME/.local/opt/nvim"; mv "$HOME/.local/opt/nvim-linux-$a" "$HOME/.local/opt/nvim"
+    ln -sfn "$HOME/.local/opt/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+  fi
+  info "$(nvim --version | head -n1)"
+  link nvim "$HOME/.config/nvim"
+  # lazy-lock.json の版に合わせてプラグインを入れる
+  nvim --headless "+Lazy! restore" +qa >/dev/null 2>&1 || warn "Neovim のプラグインを入れられませんでした（nvim を起動して :Lazy で確認）"
+}
+
 do_vscode() {
   step "VS Code の拡張機能"
   if ! have code; then
@@ -255,7 +302,7 @@ do_doctor() {
   step "確認"
   asdf_env
   local c
-  for c in git gh docker asdf node python uv wtp fzf rg fd bat tmux psql claude codex code; do
+  for c in git gh docker asdf node python uv wtp fzf rg fd bat tmux psql claude codex herdr nvim code; do
     local flag=--version; [[ "$c" == tmux ]] && flag=-V
     if have "$c"; then printf '  ✅ %-7s %s\n' "$c" "$("$c" $flag 2>/dev/null | head -n1)"; else printf '  ❌ %s\n' "$c"; fi
   done

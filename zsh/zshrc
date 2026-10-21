@@ -47,6 +47,13 @@ command -v lsd >/dev/null 2>&1 && alias ls='lsd'
 [[ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]] && . "$HOME/google-cloud-sdk/path.zsh.inc"
 [[ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]] && . "$HOME/google-cloud-sdk/completion.zsh.inc"
 
+# ---------- Claude Code ----------
+# 既定のモデル。リポジトリの .claude/settings.json（policy-cloud のチームの設定は sonnet）より優先される
+export ANTHROPIC_MODEL=opus
+
+# ---------- herdr ----------
+command -v herdr >/dev/null 2>&1 && source <(herdr completion zsh)
+
 # ---------- worktree ----------
 command -v wtp >/dev/null 2>&1 && eval "$(wtp shell-init zsh)"
 

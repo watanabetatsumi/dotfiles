@@ -48,8 +48,9 @@ cd dotfiles && ./install.sh
 | `uv` / `wtp` / `tflint` / `gcloud` | それぞれ公式の配布物から |
 | `zsh` / `dotfiles` | oh-my-zsh、`~/.zshrc`・`~/.gitconfig`・`~/.tmux.conf` のリンク、git のメールアドレス（`~/.gitconfig.local`） |
 | `github` | `gh auth login`（ブラウザでログイン） |
-| `claude` / `codex` | Claude Code と Codex CLI、設定と skill、各エージェントの `AGENTS.md` |
+| `claude` / `codex` | Claude Code と Codex CLI、設定と skill、`CLAUDE.md`、各エージェントの `AGENTS.md`、Codex に任せるプラグイン（openai/codex-plugin-cc）、Codex の既定のモデル |
 | `projects` | `~/projects/my-product-harness`（skill をリンク）、`~/projects/policy-cloud/{main,worktree,devtools}` |
+| `herdr` / `nvim` | herdr と herdr-nvim-nav（版を固定）、Neovim 0.12.0 と設定（`Lazy! restore`） |
 | `vscode` | `vscode/extensions.txt` の拡張機能（Windows 側の VS Code に WSL 拡張を入れてから） |
 | `schedule` | 毎週月曜 9:00 の worktree 整理（systemd のユーザータイマー） |
 | `doctor` | 入ったかの確認と、残りの手作業 |
@@ -60,8 +61,11 @@ cd dotfiles && ./install.sh
 |---|---|---|
 | `zsh/zshrc` | `~/.zshrc` | Mac / Linux 共通。マシン固有の設定は `~/.zshrc.local` |
 | `git/gitconfig` | `~/.gitconfig` | メールアドレスは `~/.gitconfig.local` |
+| `herdr/config.toml` | `~/.config/herdr/config.toml` | herdr のキー（prefix + a / y / f / shift+b / t、Ctrl+h/j/k/l）、タブの行の右端のキーの一覧、通知 |
+| `nvim/` | `~/.config/nvim` | Neovim の設定（lazy.nvim）。WSL では Neovim 0.12.0 を公式の配布物から入れる |
 | `tmux/tmux.conf` | `~/.tmux.conf` | Mac / Linux 共通。クリップボードは pbcopy・clip.exe（WSL）・xclip を自動で選ぶ（tmux 3.2 以上） |
 | `tool-versions` | `~/.tool-versions` | asdf のグローバルなバージョン |
+| `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | 全プロジェクト共通の指示。手を動かす作業は Codex（`codex:codex-rescue`、gpt-6.1-sol）に任せ、Claude は計画と確認を受け持つ |
 | `claude/settings.json` | `~/.claude/settings.json` | 無いときだけコピー。Orca などが書き込む hooks・statusLine は含めない |
 | `claude/skills/` | `~/.claude/skills/` | my-product-harness 以外の skill。`react-best-practice` は Vercel の MIT ライセンス |
 | `agents/` | `~/.codex/AGENTS.md`・`~/.dsh/AGENTS.md` | policy-cloud の devtools への導線 |

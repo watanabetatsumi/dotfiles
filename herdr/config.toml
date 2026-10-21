@@ -1,0 +1,109 @@
+onboarding = false
+# herdr の設定（dotfiles で管理し、~/.config/herdr/config.toml にリンクする）
+# ここには既定から変えたものだけを書く。既定は `herdr --default-config` で見られる。
+# 変えたら `herdr server reload-config`（または prefix+shift+r）で反映する。
+# prefix は tmux と同じ ctrl+b（既定のまま）。
+#
+# 下の [[keys.command]] は policy-cloud の devtools（~/projects/policy-cloud/devtools/bin/wta）を呼ぶ。
+# コマンドは /bin/sh で動くので、PATH に herdr（~/.local/bin）と fzf（Mac は /opt/homebrew/bin）を足している。
+
+# worktree は wta で作る（wtp の準備と、ポート・DB の割り当てが走る）。herdr 標準の New worktree は使わない
+[keys]
+new_worktree = ""
+
+# 入力待ちのエージェントへ移る。押すたびに次の入力待ちへ
+[[keys.command]]
+key = "prefix+a"
+type = "shell"
+command = 'PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH" WTA_HERDR_PANE="$HERDR_ACTIVE_PANE_ID" "$HOME/projects/policy-cloud/devtools/bin/wta" waiting'
+
+# 入力待ちのエージェントの画面を映して、その場で答える（↑↓ Enter Esc 数字をそのエージェントに送る）
+[[keys.command]]
+key = "prefix+y"
+type = "popup"
+command = 'PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH" WTA_HERDR_PANE="$HERDR_ACTIVE_PANE_ID" "$HOME/projects/policy-cloud/devtools/bin/wta" approve'
+width = "90%"
+height = "90%"
+
+# worktree を選んで、今のタブにエージェントとシェルの列を足す
+[[keys.command]]
+key = "prefix+f"
+type = "popup"
+command = 'PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH" WTA_HERDR_PANE="$HERDR_ACTIVE_PANE_ID" "$HOME/projects/policy-cloud/devtools/bin/wta" pick'
+width = "80%"
+height = "70%"
+
+# ブランチを選ぶか新しい名前を打って、worktree を作り、今のタブに列を足す
+[[keys.command]]
+key = "prefix+shift+b"
+type = "popup"
+command = 'PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH" WTA_HERDR_PANE="$HERDR_ACTIVE_PANE_ID" "$HOME/projects/policy-cloud/devtools/bin/wta" pick-new'
+width = "80%"
+height = "70%"
+
+# herdr 標準の New worktree のキー（prefix + shift + g）でも、wta のブランチ作成を開く
+[[keys.command]]
+key = "prefix+shift+g"
+type = "popup"
+command = 'PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH" WTA_HERDR_PANE="$HERDR_ACTIVE_PANE_ID" "$HOME/projects/policy-cloud/devtools/bin/wta" pick-new'
+width = "80%"
+height = "70%"
+
+# 今いるペインのフォルダのファイルツリーを開く（Neovim の neo-tree）
+#   左にツリー、右にファイル。ツリーで選んだファイルが右に開く。Ctrl+h / Ctrl+l でツリーとファイルを行き来する。:qa で閉じる
+[[keys.command]]
+key = "prefix+t"
+type = "popup"
+command = 'PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"; cd "${HERDR_ACTIVE_PANE_CWD:-$HOME}" && exec nvim +"Neotree position=left"'
+width = "90%"
+height = "90%"
+
+[ui]
+# サイドバーのエージェントを、入力待ちが上に来る順に並べる
+agent_panel_sort = "priority"
+
+# タブの行の右端に、自分で足したキーの一覧を常に出す（prefix は ctrl+b。text には色を付けられない）
+tab_bar_right = [
+  { type = "text", text = "ショートカット：  ^b + a 入力待ちへ" },
+  { type = "text", text = "y 答える" },
+  { type = "text", text = "f 列を足す" },
+  { type = "text", text = "B 新しいブランチ" },
+  { type = "text", text = "t フォルダー一覧表示" },
+  { type = "text", text = "z ズーム" },
+  { type = "text", text = "^hjkl 移動" },
+  # ? は herdr の既定（prefix + ?）のキー一覧。右端に寄りすぎないよう、後ろに空白を入れて少し内側に出す
+  { type = "text", text = "? そのほかのキーバインド                " },
+]
+tab_bar_right_separator = " │ "
+
+status_indicators = "dots"
+# サイドバーの各エージェントの行の下に、その worktree の git の要約を出す（wta dashboard --follow が送る）
+[ui.sidebar.agents]
+rows = [["state_icon", "workspace", "tab"], ["agent"], ["$git"]]
+
+[ui.toast]
+# エージェントが入力待ち・完了になったら、herdr の中に通知を出す
+delivery = "herdr"
+
+# Ctrl+h/j/k/l: Neovim の分割の中を移動し、端まで来たら herdr のペインに移る（herdr-nvim-nav プラグイン）
+#   Neovim 以外のペイン（claude・シェル）では、herdr のペインの移動になる（シェルの Ctrl+l などは効かなくなる）
+#   プラグインを入れる: herdr plugin install aimdevlee/herdr-nvim-nav --ref ec047fd6d8d0269d54a34e9405af28d8aad4c8f0
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "herdr-nvim-nav.left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "herdr-nvim-nav.down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "herdr-nvim-nav.up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "herdr-nvim-nav.right"
